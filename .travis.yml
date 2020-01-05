@@ -1,0 +1,26 @@
+language: go
+sudo: false
+
+os:
+  - linux
+
+env:
+  - GO111MODULE=on
+
+go:
+  - 1.13.x
+
+script:
+  # Run tests
+  - go test -race -v -bench=. -coverprofile=coverage.txt -covermode=atomic ./...
+
+after_success:
+  - bash <(curl -s https://codecov.io/bash)
+  - wget https://raw.githubusercontent.com/DiscordHooks/travis-ci-discord-webhook/master/send.sh
+  - chmod +x send.sh
+  - ./send.sh success $WEBHOOK_URL
+
+after_failure:
+  - wget https://raw.githubusercontent.com/DiscordHooks/travis-ci-discord-webhook/master/send.sh
+  - chmod +x send.sh
+  - ./send.sh failure $WEBHOOK_URL
